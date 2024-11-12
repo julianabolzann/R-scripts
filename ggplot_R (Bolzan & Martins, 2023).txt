@@ -1,0 +1,541 @@
+# Bibliotecas utilizadas
+
+library(tidyverse)
+library(readxl)
+library(forcats)
+
+# ver diretório no R -> função "session" -> "set working directory" -> "choose directory..."
+
+df <- read_excel("data/Quali.xlsx")
+
+# Tratamento dos dados -> fatores 
+
+df <- rename_with(df, ~ tolower(gsub(" ", "_", .x, fixed = TRUE))) 
+
+df <- df |> 
+  rename("obs" = `...17`,
+         "populacao" = "população") |> 
+  mutate(disease = as.factor(disease),
+         grupos = as.factor(grupos),
+         field = as.factor(field_pharmacology),
+         populacao = as.factor(populacao),
+         intervention = as.factor(intervention))
+
+
+# Análise dos dados -> N° de protocolos por area da farmacologia
+
+field <- df |> 
+  group_by(field_pharmacology) |> 
+  summarise("n" = n())
+
+f1 <- df |> group_by(field_pharmacology) %>%
+  summarise(counts = n()) %>%
+  mutate(field_pharmacology = fct_reorder(field_pharmacology, desc(counts))) %>% # reordernar categoria de acordo com frequencia
+  
+  # O código anterior pode ser usado para avaliar o número de protocolos para cada variável (ex: Intervenção -> antibióticos, antinflamatórios, antidepressivos, etc).
+  
+  ggplot(aes(
+    x = fct_infreq(field_pharmacology),
+    y = counts,
+    fill = fct_infreq(field_pharmacology)
+  )) +
+  geom_bar(stat = 'identity') +
+  scale_fill_manual(
+    values = c(
+      "#3740e9", #sistema urinário
+      "#374fe9", #toxicidade
+      "#3772e9", #sistema respiratório
+      "#377be9", #sistema gastrointestinal
+      "#3781e9", #oncologia
+      "#378ae9", #sistema endócrino 
+      "#37b6e9", #dor e analgesia 
+      "#37bfe9", #outros
+      "#37cbe9", #sistema cardiovascular 
+      "#37e0e9", #inflamação e imunologia
+      "#37e9e6"  #sistema nervoso
+    )) +
+  labs(y = "Número de protocolos", x = "Área da Farmacologia") +
+  scale_x_discrete(
+    labels = function(x)
+      str_wrap(x, width = 20)
+  ) +
+  geom_text(
+    aes(label = counts),
+    stat = 'identity',
+    size = 3,
+    position = position_dodge(width = 1.5),
+    hjust = -0.5
+  ) + 
+  scale_y_continuous(expand = c(0,0), limits = c(0,80)) +
+  coord_flip() +
+  theme_light() +
+  theme(
+    axis.text = element_text(
+      size = 12,
+      angle = 0,
+      color = "#2c3c4c"
+    ),
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 5)),
+    plot.title = element_text(size = 12),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 10, hjust = .5),
+    legend.position = "none",
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+# Vizualização 
+
+f1
+
+#Salvando o gráfico
+
+cowplot::save_plot(filename = "f1.eps", #pode ser salvo "f1.png"
+          plot = f1,
+          dpi = 600,
+          path = "figure")
+
+# Protocolos por Doença ou condição modulada em humanos
+
+# Bibliotecas utilizadas
+
+library(tidyverse)
+library(readxl)
+library(forcats)
+
+# ver diretório no R -> função "session" -> "set working directory" -> "choose directory..."
+
+df <- read_excel("data/Quali.xlsx")
+
+# Tratamento dos dados -> fatores 
+
+df <- rename_with(df, ~ tolower(gsub(" ", "_", .x, fixed = TRUE))) 
+
+df <- df |> 
+  rename("obs" = `...17`,
+         "populacao" = "população") |> 
+  mutate(disease = as.factor(disease),
+         grupos = as.factor(grupos),
+         field = as.factor(field_pharmacology),
+         populacao = as.factor(populacao),
+         intervention = as.factor(intervention))
+
+
+# Análise dos dados -> N° de protocolos por area da farmacologia
+
+field <- df |> 
+  group_by(disease) |> 
+  summarise("n" = n())
+
+f1 <- df |> group_by(disease) %>%
+  summarise(counts = n()) %>%
+  mutate(disease = fct_reorder(disease, desc(counts))) %>% # reordernar categoria de acordo com frequencia
+  ggplot(aes(
+    x = fct_infreq(disease),
+    y = counts,
+    fill = fct_infreq(disease)
+  )) +
+  geom_bar(stat = 'identity') +
+  scale_fill_manual(
+    values = c(#
+      "#3740e9",#tecidos periféricos
+      "#374fe9",#SOP
+      "#3772e9",#modelos cinéticos
+      "#3772e9",#metabolismo sindrômico
+      "#3772e9",#insolação
+      "#378ae9",#hipoperfusão cerebral crônica
+      "#3781e9",#hérnia diafragmática congênita
+      "#377be9",#envelhecimento
+      "#3781e9",#distúrbios relacionados à idade
+      "#3781e9",#distúrbios neurológicos
+      "#378ae9",#distúrbios intestinais 
+      "#37b6e9",#distúrbios genéticos
+      "#37bfe9",#distúrbios do ciclo sono-vigília
+      "#37bfe9",#distúrbios do neurodesenvolvimento
+      "#37bfe9",#distúrbios neurodegenerativos
+      "#37bfe9",#descoberta de drogas
+      "#37bfe9",#traumatismo craniano 
+      "#37bfe9",#nenhuma doença específica 
+      "#37bfe9",#memória
+      "#37e9e6",#infertilidade
+      "#37e9e6",#distúrbios autoimunes
+      "#37e9e6",#dermatite atópica
+      "#37e9e6",#tratamento ortodôntico
+      "#37e9e6",#toxicidade
+      "#37e9e6",#gravidez
+      "#37e9dd",#efeitos farmacológicos
+      "#37e9dd",#distúrbios renais
+      "#37e9dd",#danos na cartilhagem
+      "#37e9dd",#cicatrização de feridas
+      "#37e9dd",#distúrbios pulmonares
+      "#37e9dd",#lesão na medula espinhal
+      "#37e9dd",#tratamentos quimioterápicos
+      "#37e9dd",#distúrbios ósseos 
+      "#37e9dd",#distúrbios inflamatórios
+      "#37e9dd",#distúrbios endócrinos
+      "#37e9dd",#distúrbios de dor
+      "#37e9dd",#neoplasias
+      "#37e9dd",#infecções
+      "#37e9dd",#distúrbios cardiovasculares
+      "#37e9dd" #distúrbios neuropsiquiátricos 
+    )) +
+  labs(y = "N° de protocolos", x = "Doenças ou condições humanas moduladas") +
+  scale_x_discrete(
+    labels = function(x)
+      str_wrap(x, width = 50)
+  ) +
+  geom_text(
+    aes(label = counts),
+    stat = 'identity',
+    size = 2,
+    position = position_dodge(width = 1.5),
+    hjust = -0.2
+  ) + 
+  scale_y_continuous(expand = c(0,0), limits = c(0,42)) +
+  coord_flip() +
+  theme_light() +
+  theme(
+    axis.text = element_text(
+      size = 5,
+      angle = 0,
+      color = "#2c3c4c"
+    ),
+    axis.title = element_text(size = 9, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 15)),
+    plot.title = element_text(size = 9),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 7, hjust = .5),
+    legend.position = "none",
+    plot.margin = margin(0, 5, 0, 0)
+  )
+
+# Esses códigos poderão ser usados para outras categoarias que se deseja quantificar o N° de protocolos disponíveis para cada variável.
+
+# Agrupando os dados para as análises (População, intervenção e doenças moduladas em humanos por area da farmacologia)
+
+# Análise 1: distribuição da população por área da farmacologia
+
+
+df <- read_excel("data/Quali.xlsx")
+
+# Tratamento dos dados -> fatores 
+
+df <- rename_with(df, ~ tolower(gsub(" ", "_", .x, fixed = TRUE))) 
+
+df <- df |> 
+  rename("obs" = `...17`,
+         "populacao" = "população") |> 
+  mutate(disease = as.factor(disease),
+         grupos = as.factor(grupos),
+         field = as.factor(field_pharmacology),
+         populacao = as.factor(populacao),
+         intervention = as.factor(intervention))
+
+f1 <- df %>% 
+  ggplot(aes(
+    x = fct_infreq(field_pharmacology),
+    fill = fct_infreq(grupos))) +
+  geom_bar() +
+  geom_text(aes(label = ..count..), stat = "count",
+            color = "black",
+            size = 3,
+            family = "mono",
+            position = "stack",
+            vjust = 1,
+            fontface = "bold") +
+labs(y = "Número de Protocolos", x = "Área da farmacologia") +
+  scale_fill_manual(
+    values = c(
+      "#C1CDC1", #1 Roedores
+      "#9AC0CD", #2 Todos os animais
+      "#FFB6C1", #3 Outros
+      "#E0FFFF"  #4 in vivo, in vitro, ex vivo
+    ),
+    name = "Distribuição da população por area da Farmacologia"
+  ) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,78)) +
+  scale_x_discrete(
+    labels = function(y)
+      str_wrap(y, width = 12)
+  ) + # legenda em mais de uma linha
+  theme_light() +
+  theme(
+    axis.text = element_text(
+      size = 12,
+      angle = 0,
+      color = "#2c3c4c"
+    ),
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 5)),
+    plot.title = element_text(size = 14),
+    plot.title.position = "plot",
+    legend.position = c(.75, .85), 
+    plot.subtitle = element_text(size = 12, hjust = 0),
+    plot.margin = margin(5, 5, 5, 5)
+  )
+
+# Vizualização 
+
+f1
+
+# Análise 2: distribuição da população por área da farmacologia
+
+
+f1 <- df %>% 
+  ggplot(aes(
+    x = fct_infreq(field_pharmacology),
+    fill = fct_infreq(populacao))) +
+  geom_bar() +
+  geom_text(aes(label = ..count..), stat = "count",
+            color = "black",
+            size = 3,
+            family = "mono",
+            position = "stack",
+            vjust = 1,
+            fontface = "bold") +
+  labs(y = "Número de protocolos", x = "Área da farmacologia") +
+  scale_fill_manual(
+    values = c(
+      "#C1CDC1", #1 todos os animais
+      "#C6E2FF", #2 roedores
+      "#B0E2FF", #3 ratos, camundongos
+      "#4682B4", #4 ratos
+      "#EEB422", #5 in vivo
+      "#FFD700", #6 in vivo, in vitro
+      "#EE00EE", #7 animais não-humanos
+      "#00868B", #8 camundongos      
+      "#63B8FF", #9 roedores, in vitro
+      "#FF69B4", #10 mamíferos
+      "#838B83", #11 todos animais
+      "#FFB6C1", #12 drosóphila
+      "#CDCD00", #13 in vivo, ex vivo
+      "#FF34B3", #14 animais (leite)
+      "#9B30FF", #15 animais, peixes, espécies marinhas
+      "#FF3E96", #16 aves
+      "#EE82EE", #17 cachorro
+      "#FF7256", #18 cachorro, gato
+      "#0000FF", #19 camundongos, C.elegans
+      "#00BFFF", #20 camundongos, ratos, coelhos, etc
+      "#FFFF00", #21 células-tronco humanas
+      "#1E90FF", #22 coelhos, ratos 
+      "#CD919E", #23 embrioões de peixes
+      "#8B668B", #24 gado bovino
+      "#8B3A62", #25 mamíferos, in vivo
+      "#40E0D0", #26 ratos, camundongos e não-humanos
+      "#836FFF", #27 ratos, coelhos e porquinho da índia
+      "#473C8B", #28 ratos, coelhos, gatos e porquinho da índia
+      "#63B8FF", #29 ratos, in vitro
+      "#9FB6CD", #30 roedores, humanos
+      "#C6E2FF", #31 roedores, in vivo
+      "#4876FF", #32 roedores, não-humanos
+      "#27408B", #33 roedores, não humanos, Drosóphila
+      "#FF0000", #34 suínos
+      "#F5F5F5", #35 todos os modelos vertebrados
+      "#EEE5DE", #36 todos os modelos híbridos
+      "#CD0000"  #37 vacas
+    ),
+    name = "Distribuição da população por área da Farmacologia"
+  ) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,78)) +
+  scale_x_discrete(
+    labels = function(y)
+      str_wrap(y, width = 12)
+  ) + # legenda em mais de uma linha
+  theme_light() +
+  theme(
+    axis.text = element_text(
+      size = 12,
+      angle = 0,
+      color = "#2c3c4c"
+    ),
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 5)),
+    plot.title = element_text(size = 12),
+    plot.title.position = "plot",
+    legend.position = c(.685, .65), 
+    plot.subtitle = element_text(size = 12, hjust = 0),
+    plot.margin = margin(5, 5, 5, 5)
+  )
+
+# Análise 3: distribuição da intervenção por área da farmacologia
+
+f1 <- df %>% 
+  ggplot(aes(
+    x = fct_infreq(field_pharmacology),
+    fill = fct_infreq(intervention))) +
+  geom_bar() +
+  geom_text(aes(label = ..count..), stat = "count",
+            color = "black",
+            size = 3,
+            family = "mono",
+            position = "stack",
+            vjust = 1,
+            fontface = "bold") +
+  labs(y = "Nº de protocolos", x = "Area da farmacologia") +
+  scale_fill_manual(
+    values = c(
+      "#C1CDC1", #1 antibióticos
+      "#FFB6C1", #2 canabinóides
+      "#FFFF5B", #3 antidiabéticos
+      "#9FB6CD", #4 antineoplásicos
+      "#EE82EE", #5 antidepressivos
+      "#E0FFFF", #6 qualquer agente farmacológico
+      "#98F5FF", #7 analgésicos
+      "#838B83", #8 antinflamatórios    
+      "#8EE5EE", #9 anestésicos
+      "#A1A5EC", #10 anti-hipertensivos
+      "#8B814C", #11 estatinas
+      "#9ACD32", #12 anti-helmínticos
+      "#FF3E96", #13 psicoestimulantes
+      "#4876FF", #14 imunossupressores                                                                         
+      "#FF69B4", #15 agentes neuroprotetores
+      "#FF7256", #16 ansiolíticos
+      "#551A8B", #17 inibidores de shRNA, siRNA, RNAj
+      "#CDBE70", #18 vasopressores
+      "#FF34B3", #19 agonistas de dopamina
+      "#00BFFF", #20 agonistas RFXP3
+      "#7AC5CD", #21 analgésicos, anestésicos
+      "#B59FEB", #22 anti-hipotensores 
+      "#C6E2FF", #23 anticorpos monoclonais
+      "#6FB1E7", #24 antifúngicos
+      "#4682B4", #25 antimicrobianos, antibióticos
+      "#FFD700", #26 fármacos hormonais
+      "#27408B", #27 fitoterápicos
+      "#00F5FF", #28 inibidores de citocinas
+      "#DF90D8", #29 vasodilatadores
+      "#9B30FF", #30 inibidores da caspases
+      "#FFFF00", #31 agentes anabolizantes
+      "#0F71AF", #32 agentes nefroprotetores
+      "#EE00EE", #33 Agonistas e antagonistas 5-HT, DA, Na, GABA, Ach, GLU
+      "#8B668B", #34 agonista e antagonista serotonina
+      "#97FFFF", #35 analgésicos, antidepressivos, antinflamatórios
+      "#8DEEEE", #36 analgésicos, antinflamatórios
+      "#00C5CD", #37 anti-chagásticos
+      "#CDC1C5", #38 anti-isquêmicos
+      "#63B8FF", #39 antibióticos, antivirais, antidiabéticos, etc
+      "#FFF0F5", #40 anticoagulantes
+      "#FFA500", #41 antidiabéticos, antineoplásicos
+      "#CDCD00", #42 antidiabéticos, antiparkinsonianos
+      "#FF0000", #43 antiepiléticos
+      "#B0E2FF", #44 antimicrobianos
+      "#EEE5DE", #45 antineoplásicos, antibióticos
+      "#F5F5F5", #46 antineoplásicos, antinflamatórios
+      "#474747", #47 antinflamatórios, anticoagulantes, broncodilatadores 
+      "#EEE9BF", #48 antiplaquetários
+      "#CD0000", #49 antipsicóticos, antidepressivos
+      "#FFDEAD", #50 esteróides cardiotônicos
+      "#00868B", #51 fármacos antioxidantes
+      "#8B008B", #52 inibidores de acetaldeído
+      "#473C8B", #53 inibidores de acetilcolinesterase
+      "#7A378B", #54 inibidores de perda óssea
+      "#2F4F4F", #55 inibidores de serina proteases
+      "#528B8B", #56 inibidores de TRL4
+      "#CD919E", #57 psicoestimulante, analgésicos
+      "#EEB422", #58 reguladores do apetite
+      "#EECFA1", #59 vasodilatadores
+      "#CDB38B"  #60 beta-bloqueadores
+    ),
+    name = "Distribuição da intervenção por area da Farmacologia"
+  ) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,78)) +
+  scale_x_discrete(
+    labels = function(y)
+      str_wrap(y, width = 12)
+  ) + # legenda em mais de uma linha
+  theme_light() +
+  theme(
+    axis.text = element_text(
+      size = 13,
+      angle = 0,
+      color = "#2c3c4c"
+    ),
+    axis.title = element_text(size = 13, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 5)),
+    plot.title = element_text(size = 13),
+    plot.title.position = "plot",
+    legend.position = c(.64,.72), 
+    plot.subtitle = element_text(size = 14, hjust = 0),
+    plot.margin = margin(5, 5, 5, 5)
+  )
+
+# Análise 4: doenças ou condições moduladas em humanos por área da farmacologia
+
+f1 <- df %>% 
+  ggplot(aes(
+    x = fct_infreq(field_pharmacology),
+    fill = fct_infreq(disease))) +
+  geom_bar() +
+  geom_text(aes(label = ..count..), stat = "count",
+            color = "black",
+            size = 3,
+            family = "mono",
+            position = "stack",
+            vjust = 1,
+            fontface = "bold") +
+  labs(y = "Nº de protocolos", x = "Area da farmacologia") +
+  scale_fill_manual(
+    values = c(
+      "#C1CDC1", #1 ddistúrbios neuropsiquiátricos
+      "#C6E2FF", #2 distúrbios cardiovasculares
+      "#9FB6CD", #4 infecções
+      "#B0E2FF", #5 neoplasias
+      "#E0FFFF", #6 distúrbios de dor
+      "#838B83", #7 distúrbios endócrinos
+      "#FF69B4", #8 distúrbios inflamatórios
+      "#8EE5EE", #9 distúrbios neurodegenerativos
+      "#A1A5EC", #10 distúrbios ósseos
+      "#8B814C", #11 tratamentos quimioterápicos
+      "#EE82EE", #12 lesão na medula espinhal
+      "#FF3E96", #13 distúrbios pulmonares
+      "#4876FF", #14 cicatrização de feridas                                                                        
+      "#FF69B4", #15 danos na cartilhagem
+      "#FF7256", #16 distúrbios renais
+      "#551A8B", #17 efeitos farmacológicos
+      "#CDBE70", #18 gravidez
+      "#FF34B3", #19 toxicidade
+      "#00BFFF", #20 tratamento ortodôntico
+      "#7AC5CD", #21 dermatite atópica
+      "#B59FEB", #22 distúrbios autoimunes
+      "#C6E2FF", #23 infertilidade
+      "#4682B4", #25 memória
+      "#FFD700", #26 nenhuma doença humana específica
+      "#27408B", #27 traumatismo craniano
+      "#8B3A62", #28 descoberta de drogas
+      "#63B8FF", #29 distúrbios neurodegenerativos
+      "#9B30FF", #30 distúrbios de neurodesenvolvimento
+      "#FFFF00", #31 distúrbios do ciclo sono-vigília
+      "#0F71AF", #32 distúrbios genéticos
+      "#EE00EE", #33 disturbios intestinais
+      "#8B668B", #34 distúrbios neurológicos
+      "#97FFFF", #35 distúrbios relacionados à idade
+      "#8DEEEE", #36 envelhecimento
+      "#00C5CD", #37 hérnia diafragmática congênita
+      "#CDC1C5", #38 hipoperfusão cerebral crônica
+      "#63B8FF", #39 insolação
+      "#FFF0F5", #40 metabolismo sindrômico
+      "#FFA500", #41 modelos cinéticos
+      "#CDCD00", #42 síndrome dos ovarios policisticos (SOP)
+      "#FF0000"  #43 tecidos periféricos
+    ),
+    name = "Doenças ou condições moduladas por area da Farmacologia"
+  ) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,78)) +
+  scale_x_discrete(
+    labels = function(y)
+      str_wrap(y, width = 12)
+  ) + # legenda em mais de uma linha
+  theme_light() +
+  theme(
+    axis.text = element_text(
+      size = 13,
+      angle = 0,
+      color = "#2c3c4c"
+    ),
+    axis.title = element_text(size = 13, face = "bold"),
+    axis.title.y = element_text(margin = margin(r = 5)),
+    plot.title = element_text(size = 13),
+    plot.title.position = "plot",
+    legend.position = c(.68,.68), 
+    plot.subtitle = element_text(size = 14, hjust = 0),
+    plot.margin = margin(5, 5, 5, 5)
+  )
