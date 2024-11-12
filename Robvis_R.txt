@@ -1,0 +1,39 @@
+# Habilitando pacote no R#
+
+install.packages (“robvis”)
+
+library(robvis)
+
+# Dados em objeto #
+
+dados <- read.csv2("testrob.csv",header=T)
+
+# Vizualização dos dados #
+
+str(dados)
+
+# Gráfico #
+
+rob_summary(dados, tool = "ROB2")
+
+# Gráfico de semáfaro #
+
+rob_traffic_light(data = dados, tool = "ROB2")
+
+rob_traffic_light(data = dados,tool = "ROB2", psize = 20)
+
+rob_summary(dados, tool = "ROB2")
+
+
+# Riscos de viés #
+
+#>  [1] "Study"                                  
+#>  [2] "Random.sequence.generation."            
+#>  [3] "Allocation.concealment."                
+#>  [4] "Blinding.of.participants.and.personnel."
+#>  [5] "Blinding.of.outcome.assessment"         
+#>  [6] "Incomplete.outcome.data"                
+#>  [7] "Selective.reporting."                   
+#>  [8] "Other.sources.of.bias."                 
+#>  [9] "Overall"                                
+#> [10] "Weight"

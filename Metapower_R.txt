@@ -1,0 +1,39 @@
+# Habilitando pacote no R#
+
+library(metapower)
+
+# Dados em objeto #
+
+dadosmeta <- mpower(effect_size = 2.5, study_size = 6, k= 3, i2 = .5, es_type = "d")
+
+# Gráfico para poder estatístico #
+
+plot_mpower(dadosmeta)
+
+print(dadosmeta)
+
+# Poder estatístico para análises de subgrupos #
+
+# Expected number of groups (n_groups) #
+# Expected effect size of each group(effect_sizes) #
+
+poder <- subgroup_power(n_groups = 4, 
+                                    effect_sizes = c(.2,.5,.3,.2), 
+                                    study_size = 4,
+                                    k = 3500,
+                                    i2 = .75,
+                                    es_type = "d")
+print(poder)
+
+plot_subgroup_power(poder)
+
+# Anotações importantes #
+
+# Effect size = tamanho do efeito da Meta-analise #
+# Study size é a média de animais por grupo # 
+# K é uma previsão de estudos necessários, uma amostra #
+# I2 é a heterogeneidade da Meta-analise #
+# I2 = 0% (No Heterogeneity)
+# I2 = 25% (Low Heterogeneity)
+# I2 = 50% (Moderate Heterogeneity)
+# I2 = 75% (Large Heterogeneity) #

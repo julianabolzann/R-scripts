@@ -1,0 +1,31 @@
+# Habilitando pacote no R#
+
+if(!require(pacman)) install.packages("pacman")
+
+library(pacman)
+
+pacman::p_load(dplyr, rel, irr)
+
+# Carregando o banco de dados #
+
+dados <- read.csv2('Kappa Cohen.csv', stringsAsFactors = TRUE)
+View(dados)                                 # Visualização dos dados em janela separada
+glimpse(dados)                              # Visualização de um resumo dos dados
+
+
+# Calculando kappa (2 observadores) #
+
+irr::kappa2(dados[-1])
+
+# Cálculo do IC 95% #
+
+rel::ckap(dados[-1], conf.level = 0.95)
+
+# Cálculo da concordância #
+
+irr::agree(dados[-1])
+
+
+# Importante: selecionar o diretório de trabalho (working directory)
+
+# Isso pode ser feito manualmente: Session > Set Working Directory > Choose Directory

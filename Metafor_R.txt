@@ -1,0 +1,54 @@
+# Habilitando pacote no R#
+
+library(metafor)
+
+# Localização dos dados #
+
+getwd()
+
+# Read .csv2 e insert in a data frame  #meta nome pasta do Excel #
+
+read.csv2("meta.csv", header=T)
+
+# Dados em objeto #
+
+dados <-read.csv2("meta.csv", header=T)
+
+# Vizualização dos dados #
+
+str(dados)
+
+#Calculando tamanho de efeito "Standardized Mean Difference" para cada grupo exeperimental #
+
+smd_meta = escalc(measure="SMD", m2i=mean.CTRL, m1i=mean.ADT, sd2i=SDM.CTRL, sd1i=SDM.ADT, n2i=N.CTRL, n1i=N.ADT, data=dados)
+
+#Vizualização dos dados#
+
+smd_meta  
+
+# Modelo de efeito aleatório #
+
+smd_rem = rma(yi,vi, method = "REML", data=smd_meta)
+
+# Vizualização dos dados #
+
+summary(smd_rem) 
+
+#Opcional#
+
+# Plotando gráfico de floresta #
+
+forest(smd_rem)
+title("nome do gráfico")
+
+# Plotando gráfico de funil #
+
+funnel(smd_rem)
+title("nome do gráfico")
+
+# Plotando gráfico trim-and-fill #
+
+trimfill(smd_rem)
+
+
+

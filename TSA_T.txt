@@ -1,0 +1,37 @@
+#Instalando o pacote RTSA#
+
+install.packages("RTSA")
+
+#habilitando as bibliotecas#
+
+library(RTSA)
+library(CompQuadForm)
+library(readxl)
+
+perioOxy
+
+#Importando data.frame#
+
+rs1 <- read_excel("rs1.xlsx")
+
+#Transformando os dados em números#
+
+rs1 <- rs1 %>% mutate(
+  mI = as.double(gsub(",", ".", gsub("\\.", "", mI))),
+  sdI = as.double(gsub(",", ".", gsub("\\.", "", sdI))),
+  mC = as.double(gsub(",", ".", gsub("\\.", "", mC))),
+  sdC = as.double(gsub(",", ".", gsub("\\.", "", sdC))),
+  nI = as.double(gsub(",", ".", gsub("\\.", "", nI))),
+  nC = as.double(gsub(",", ".", gsub("\\.", "", nC)))
+) 
+
+#Construindo o gráfico TSA#
+
+outRTSA <- RTSA(type = "analysis", data = rs1, outcome = "MD", mc = 500,
+                side = 2, alpha = 0.05, beta = 0.1, es_alpha = "esOF", es_beta = "esOF", re_method = "DL")
+
+#plotando o gráfico TSA#
+
+plot(outRTSA)
+
+outRTSA
